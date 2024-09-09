@@ -1,9 +1,13 @@
 import { MapPin, Calendar, ArrowRight, UserRoundPlus, Settings2, X, AtSign, Plus } from "lucide-react"
-import { useState } from "react"
+import { FormEvent, FormEventHandler, useState } from "react"
 
 export function App() {
   const [isGuestsInputOpen, setGuestsInputOpen] = useState(false)
   const [isGuestsModalOpen, setGuestsModalOpen] = useState(false)
+  const [emailsToInvite, setEmailsToInvite] = useState([
+    'israel@gmail.com',
+    'baruque@gmail.com'
+  ])
 
   function openGuestsInput(){
     setGuestsInputOpen(true)
@@ -19,6 +23,35 @@ export function App() {
 
   function closeGuestsModal(){
     setGuestsModalOpen(false)
+  }
+
+  function addNewEmailToInvite(event: FormEvent<HTMLFormElement>){
+    event.preventDefault()
+    
+    const data = new FormData(event.currentTarget)
+    // const email: string | undefined = data.get('email')?.toString ?? undefined
+    const email = data.get('email')?.toString()
+
+    if(!email){
+      return
+    }
+
+    if(emailsToInvite.includes(email)) {
+      return
+    }
+
+    setEmailsToInvite([
+      ...emailsToInvite,
+      email
+    ])
+
+    event.currentTarget.reset()
+  }
+
+  function removeEmailsFromInvite(emailToRemove: string) {
+    const newEmailList = emailsToInvite.filter(email => email !== emailToRemove)
+
+    setEmailsToInvite(newEmailList)
   }
 
   return (
@@ -78,8 +111,9 @@ export function App() {
       </div>
       {isGuestsModalOpen && (
         <div className="fixed indent-0 bg-black/60 h-screen w-full flex items-center justify-center">
-          <div className="w-[640px] h-96 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
-            {/* //w-[640px] */}
+          
+          <div className="w-[640px] min-h-60 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5"> {/*min-h-60*/}
+                        
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Selecionar convidados</h2>
@@ -89,42 +123,39 @@ export function App() {
                 Os convidados irão receber e-mails para confirmar a participação na viagem
               </p>
             </div>
+            
             <div className="flex flex-wrap gap-2">
-              <div className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
-                <span className="text-zinc-300">jessica.white44@yahoo.com</span>
-                <button type="button"><X className="size-4 text-zinc-400"/></button>
-              </div>
-              <div className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
-                <span className="text-zinc-300">erik_leffler3@gmail.com</span>
-                <button type="button"><X className="size-4 text-zinc-400"/></button>
-              </div>
-              <div className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
-                <span className="text-zinc-300">rebekah.conn21@gmail.com</span>
-                <button type="button"><X className="size-4 text-zinc-400"/></button>
-              </div>
-              <div className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
-                <span className="text-zinc-300">emile.mayer25@yahoo.com</span>
-                <button type="button"><X className="size-4 text-zinc-400"/></button>
-              </div>
-              <div className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
-                <span className="text-zinc-300">justus_hessel81@hotmail.com</span>
-                <button type="button"><X className="size-4 text-zinc-400"/></button>
-              </div>
+              {emailsToInvite.map(email => {
+                  return (
+                    <div key={email} className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
+                      <span className="text-zinc-300">{email}</span>
+                      <button type="button"><X onClick={() => removeEmailsFromInvite(email)} className="size-4 text-zinc-400"/></button>
+                    </div>
+                  )
+                })
+              }
             </div>
-            <div className="w-full h-px bg-zinc-800 flex ">
-              <form className="p-2.5 bg-zinc-950 h-16 border border-zinc-800 rounded-lg flex items-center gap-2">
-                <div className="px-2 flex items-center gap-2 flex-1">
+            
+            <div className="w-full h-px bg-zinc-800">
+              <form onSubmit={addNewEmailToInvite} className="p-2.5 bg-zinc-950 h-16 border border-zinc-800 rounded-lg flex items-center gap-2">
+                <div className="px-2 flex items-center flex-1 gap-2">
                   <AtSign className="text-zinc-400 size-5" />
-                    <input type="text" placeholder="Digite o e-mail do cocvidado" 
-                      className="bg-transparent text-lg placeholder:text-zinc-400 outline-none flex-1"/>
+                    <input 
+                      type="email" 
+                      name="email"
+                      placeholder="Digite o e-mail do cocvidado" 
+                      className="bg-transparent text-lg placeholder:text-zinc-400 outline-none flex-1"
+                    />
                 </div>
-                <button className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
+                <button type="submit" className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
                   Convidar
                   <Plus className="size-5"/>
                 </button>
               </form>
             </div>
+
           </div>
+        
         </div>
       )}
     </div>
