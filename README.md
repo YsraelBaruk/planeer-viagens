@@ -7,3 +7,4 @@ Este projeto é um planner de viagens
 - TailwindCSS
 - LucidReact
 - React Router
+- React DayPicker
